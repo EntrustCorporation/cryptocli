@@ -1,0 +1,27 @@
+Golang installation
+--------------------
+
+1. Check for latest stable Golang Linux version at https://go.dev/dl/
+
+2. As root, do, wget https://go.dev/dl/go1.21.0.linux-amd64.tar.gz
+
+3. As root, tar -C /usr/local -xzf go1.21.0.linux-amd64.tar.gz
+
+4. Go should be installed at, /usr/local/go/bin/go. To find go binary, adjust PATH as, export PATH=$PATH:/usr/local/go/bin
+
+GoLang uninstallation
+----------------------
+
+1. As root, rm -rf /usr/local/go
+
+How CryptoCLI is built?
+----------------------
+
+The source of our CryptoCLI can be found at vaultcli/cryptocli in htdc repo.
+
+The Makefile at cryptocli/Makefile does the following,
+
+1. Creates a temporary Go workspace at vaultcli/cryptocli-build
+2. Copies all required files and packages from vaultcli to vaultcli/cryptocli and copies the soucre code to the src/ directory of tmp workspace(vaultcli/cryptocli-build). 
+3. Run commands to create go mod and go sums files to download required packages.
+4. Required Linux & Windows binaries are compiled & built at vaultcli/cryptocli-build/bin directory. Note that these for amd64 architecture systems.
