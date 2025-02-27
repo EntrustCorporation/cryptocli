@@ -21,7 +21,11 @@ cryptocli's for Linux & Windows for each release can be found in Releases sectio
 The code in this repo corresponds to the latest released version of cryptocli. In general, to use cryptocli, head over to Releases section to get pre-compiled binaries. If you do plan to build, follow instructions below.
 1. Install go. cryptocli/Makefile expects to find go at /usr/local/go/bin/go
 2. cd to cryptocli/
-3. To build Linux & Windows cli binaries, do, # gmake all
-4. To clean workspace, do # gmake clean
+3. To build Linux & Windows cli binaries,
+   
+   ```$ gmake all```
+5. To clean workspace,
+
+   ```$ gmake clean```
 
 For more information, see the Tokenization Vault chapter in the Key Management Systems documentation at https://trustedcare.entrust.com/.
