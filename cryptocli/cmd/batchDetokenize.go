@@ -76,7 +76,9 @@ var batchDetokenizeCmd = &cobra.Command{
 				os.Exit(5)
 			}
 
-			fmt.Println("\n" + retStr + "\n")
+			retMap := JsonArrayStrToMap(retStr)
+			jsonData, _ := JSONMarshalIndent(retMap)
+			fmt.Println("\n" + string(jsonData) + "\n")
 			os.Exit(0)
 		}
 	},

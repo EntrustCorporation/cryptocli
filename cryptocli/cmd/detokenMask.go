@@ -37,8 +37,10 @@ var detokenMaskCmd = &cobra.Command{
 		tokenData, _ := flags.GetString("tokenData")
 		params["tokenData"] = tokenData
 		
-		keyGuid, _ := flags.GetString("keyGuid")
-		params["keyGuid"] = keyGuid
+		if flags.Changed("keyGuid") {
+			keyGuid, _ := flags.GetString("keyGuid")
+			params["keyGuid"] = keyGuid
+		}
 
 		jsonParams, err := json.Marshal(params)
 		if err != nil {
@@ -70,7 +72,8 @@ var detokenMaskCmd = &cobra.Command{
 				fmt.Println("\n" + retStr + "\n")
 				os.Exit(3)
 			} else {
-				fmt.Println("\n" + retStr + "\n")
+				jsonData, _ := JSONMarshalIndent(retMap)
+				fmt.Println("\n" + string(jsonData) + "\n")
 				os.Exit(0)
 			}
 		}

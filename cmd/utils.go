@@ -114,6 +114,16 @@ func JsonStrToMap(jsonStr string) map[string]interface{} {
 	return jsonMap
 }
 
+func JsonArrayStrToMap(jsonArrayStr string) []map[string]interface{} {
+	var jsonArray []map[string]interface{}
+	err := json.Unmarshal([]byte(jsonArrayStr), &jsonArray)
+	if err != nil {
+		fmt.Println("Error parsing json array string: ", err)
+		os.Exit(1)
+	}
+	return jsonArray
+}
+
 func IsJSON(str string) bool {
 	var js json.RawMessage
 	return json.Unmarshal([]byte(str), &js) == nil

@@ -72,7 +72,8 @@ var deTokenizeCmd = &cobra.Command{
 				fmt.Println("\n" + retStr + "\n")
 				os.Exit(3)
 			} else {
-				fmt.Println("\n" + retStr + "\n")
+				jsonData, _ := JSONMarshalIndent(retMap)
+				fmt.Println("\n" + string(jsonData) + "\n")
 				os.Exit(0)
 			}
 		}

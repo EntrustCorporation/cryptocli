@@ -37,6 +37,35 @@ const (
 	ContentTypeJSON = "application/json"
 )
 
+func GetTLSConfig(caCertPool *x509.CertPool) *tls.Config {
+	return &tls.Config{
+		InsecureSkipVerify: true, // Skip default verification
+		VerifyPeerCertificate: func(rawCerts [][]byte, _ [][]*x509.Certificate) error {
+			cert, err := x509.ParseCertificate(rawCerts[0])
+			if err != nil {
+				return err
+			}
+
+			opts := x509.VerifyOptions{
+				Roots:         caCertPool,
+				Intermediates: x509.NewCertPool(),
+				// DNSName is omitted to skip CN/SAN check
+			}
+
+			for _, certBytes := range rawCerts[1:] {
+				intermediate, err := x509.ParseCertificate(certBytes)
+				if err != nil {
+					return err
+				}
+				opts.Intermediates.AddCert(intermediate)
+			}
+
+			_, err = cert.Verify(opts)
+			return err
+		},
+	}
+}
+
 // DoPostFormData sends an API request
 func DoPostFormData(endpoint string,
 	cacert string,
@@ -107,7 +136,7 @@ func DoPostFormData(endpoint string,
 
 		caCertPool := x509.NewCertPool()
 		caCertPool.AppendCertsFromPEM(caCert)
-		tr.TLSClientConfig = &tls.Config{RootCAs: caCertPool}
+		tr.TLSClientConfig = GetTLSConfig(caCertPool)
 	} else {
 		fmt.Println("\n###############################################################################\n" +
 			"Insecure request. Entrust Vault certificate not verified. \n" +
@@ -174,7 +203,7 @@ func DoGet(endpoint string,
 
 		caCertPool := x509.NewCertPool()
 		caCertPool.AppendCertsFromPEM(caCert)
-		tr.TLSClientConfig = &tls.Config{RootCAs: caCertPool}
+		tr.TLSClientConfig = GetTLSConfig(caCertPool)
 	} else {
 		fmt.Println("\n###############################################################################\n" +
 			"Insecure request. Entrust Vault certificate not verified. \n" +
@@ -233,7 +262,7 @@ func DoDelete(endpoint string,
 
 		caCertPool := x509.NewCertPool()
 		caCertPool.AppendCertsFromPEM(caCert)
-		tr.TLSClientConfig = &tls.Config{RootCAs: caCertPool}
+		tr.TLSClientConfig = GetTLSConfig(caCertPool)
 	} else {
 		fmt.Println("\n###############################################################################\n" +
 			"Insecure request. Entrust Vault certificate not verified. \n" +
@@ -289,7 +318,7 @@ func DoPatch(endpoint string,
 
 		caCertPool := x509.NewCertPool()
 		caCertPool.AppendCertsFromPEM(caCert)
-		tr.TLSClientConfig = &tls.Config{RootCAs: caCertPool}
+		tr.TLSClientConfig = GetTLSConfig(caCertPool)
 	} else {
 		fmt.Println("\n###############################################################################\n" +
 			"Insecure request. Entrust Vault certificate not verified. \n" +
@@ -346,7 +375,7 @@ func DoPost(endpoint string,
 
 		caCertPool := x509.NewCertPool()
 		caCertPool.AppendCertsFromPEM(caCert)
-		tr.TLSClientConfig = &tls.Config{RootCAs: caCertPool}
+		tr.TLSClientConfig = GetTLSConfig(caCertPool)
 	} else {
 		fmt.Println("\n###############################################################################\n" +
 			"Insecure request. Entrust Vault certificate not verified. \n" +
@@ -443,7 +472,7 @@ func DoPost2(endpoint string,
 
 		caCertPool := x509.NewCertPool()
 		caCertPool.AppendCertsFromPEM(caCert)
-		tr.TLSClientConfig = &tls.Config{RootCAs: caCertPool}
+		tr.TLSClientConfig = GetTLSConfig(caCertPool)
 	} else {
 		fmt.Println("\n###############################################################################\n" +
 			"Insecure request. Entrust Vault certificate not verified. \n" +
@@ -507,7 +536,7 @@ func DoDownload(endpoint string,
 
 		caCertPool := x509.NewCertPool()
 		caCertPool.AppendCertsFromPEM(caCert)
-		tr.TLSClientConfig = &tls.Config{RootCAs: caCertPool}
+		tr.TLSClientConfig = GetTLSConfig(caCertPool)
 	} else {
 		fmt.Println("\n###############################################################################\n" +
 			"Insecure request. Entrust Vault certificate not verified. \n" +
@@ -575,7 +604,7 @@ func DoGetDownload(endpoint string,
 
 		caCertPool := x509.NewCertPool()
 		caCertPool.AppendCertsFromPEM(caCert)
-		tr.TLSClientConfig = &tls.Config{RootCAs: caCertPool}
+		tr.TLSClientConfig = GetTLSConfig(caCertPool)
 	} else {
 		fmt.Println("\n###############################################################################\n" +
 			"Insecure request. Entrust Vault certificate not verified. \n" +

@@ -1,5 +1,5 @@
 /*
- Copyright 2023-2025 Entrust Corporation
+ Copyright 2025 Entrust Corporation
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,9 +24,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var importKeyCmd = &cobra.Command{
-	Use:   "import-key",
-	Short: "Import Key",
+var importClearKeyCmd = &cobra.Command{
+	Use:   "import-clear-key",
+	Short: "Import Clear Key",
 	Run: func(cmd *cobra.Command, args []string) {
 		flags := cmd.Flags()
 		params := map[string]interface{}{}
@@ -47,16 +47,8 @@ var importKeyCmd = &cobra.Command{
 		key_material, _ := flags.GetString("key_material")
 		params["key_material"] = key_material
 
-		wrapping_key_guid, _ := flags.GetString("wrapping_key_guid")
-		params["wrapping_key_guid"] = wrapping_key_guid
-
 		cipher, _ := flags.GetString("cipher")
 		params["cipher"] = cipher
-
-		if flags.Changed("sha256") {
-			sha256, _ := flags.GetBool("sha256")
-			params["sha256"] = sha256
-		}
 
 		jsonParams, err := json.Marshal(params)
 		if err != nil {
@@ -64,7 +56,7 @@ var importKeyCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		endpoint := GetEndPoint("", "1.0", "key_import")
+		endpoint := GetEndPoint("", "1.0", "clear_key_import")
 		ret, err := DoPost(endpoint,
 			GetCACertFile(),
 			AuthTokenKV(),
@@ -89,31 +81,26 @@ var importKeyCmd = &cobra.Command{
 		if _, present := retMap["error"]; present {
 			os.Exit(3)
 		}
-		fmt.Println("Key successfully imported:", name,
+		fmt.Println("Key successfully Imported:", name,
 			"\n")
 		os.Exit(0)
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(importKeyCmd)
-	importKeyCmd.Flags().StringP("keyset_guid", "k", "",
+	rootCmd.AddCommand(importClearKeyCmd)
+	importClearKeyCmd.Flags().StringP("keyset_guid", "k", "",
 		"Keyset to be used for importing this key")
-	importKeyCmd.Flags().StringP("name", "n", "",
+	importClearKeyCmd.Flags().StringP("name", "n", "",
 		"Name of the key to be created")
-	importKeyCmd.Flags().StringP("description", "d", "",
+	importClearKeyCmd.Flags().StringP("description", "d", "",
 		"Key description")
-	importKeyCmd.Flags().StringP("cipher", "c", "",
+	importClearKeyCmd.Flags().StringP("cipher", "c", "",
 		"Cipher for this key")
-	importKeyCmd.Flags().StringP("key_material", "m", "",
-		"wrapped key material for importing")
-	importKeyCmd.Flags().StringP("wrapping_key_guid", "w", "",
-		"Key GUID to unwrap the key_material")
-	importKeyCmd.Flags().BoolP("sha256", "s", false,
-    	"True if you want to use SHA256 hash for unwrapping. Default hash is SHA1")
+	importClearKeyCmd.Flags().StringP("key_material", "m", "",
+		"base64 key material for importing")
 
-	importKeyCmd.MarkFlagRequired("key_material")
-	importKeyCmd.MarkFlagRequired("name")
-	importKeyCmd.MarkFlagRequired("cipher")
-	importKeyCmd.MarkFlagRequired("wrapping_key_guid")
+	importClearKeyCmd.MarkFlagRequired("key_material")
+	importClearKeyCmd.MarkFlagRequired("name")
+	importClearKeyCmd.MarkFlagRequired("cipher")
 }

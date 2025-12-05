@@ -1,5 +1,5 @@
 /*
- Copyright 2023-2025 Entrust Corporation
+ Copyright 2025 Entrust Corporation
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,29 +24,36 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var batchTokenizeCmd = &cobra.Command{
-	Use:   "batch-tokenize",
-	Short: "Batch Tokenize. Please provide policyName, keyGuid and tokenData alternatively.",
+var batchDecryptCmd = &cobra.Command{
+	Use:   "batch-decrypt",
+	Short: "Batch Decrypt. Please provide keyGuid, data, mode, iv and aad alternatively.",
 	Run: func(cmd *cobra.Command, args []string) {
 		flags := cmd.Flags()
 
-		policyName, _ := flags.GetStringArray("policyName")
-		tokenData, _ := flags.GetStringArray("tokenData")
+		data, _ := flags.GetStringArray("data")
 		keyGuid, _ := flags.GetStringArray("keyGuid")
+		mode, _ := flags.GetStringArray("mode")
+		iv, _ := flags.GetStringArray("iv")
+		aad, _ := flags.GetStringArray("aad")
 
-		if len(policyName) != len(tokenData) || len(policyName) != len(keyGuid) {
+		if len(mode) != len(data) || len(mode) != len(keyGuid) || len(mode) != len(iv) || len(mode) != len(aad) {
 			fmt.Println("Missing parameters. Please check and try again")
 			os.Exit(1)
 		}
 
 		request := []interface{}{}
 
-		for i := 0; i < len(policyName); i++ {
+		for i := 0; i < len(mode); i++ {
 			params := map[string]interface{}{}
-			params["policyName"] = policyName[i]
-			params["tokenData"] = tokenData[i]
-			if keyGuid[i] != "0" {
-				params["keyGuid"] = keyGuid[i]
+			params["keyGuid"] = keyGuid[i]
+			params["data"] = data[i]
+			params["mode"] = mode[i]
+			
+			if iv[i] != "0" {
+				params["iv"] = iv[i]
+			}
+			if aad[i] != "0" {
+				params["aad"] = aad[i]
 			}
 			request = append(request, params)
 		}
@@ -57,7 +64,7 @@ var batchTokenizeCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		endpoint := GetEndPoint("", "1.0", "batch/token")
+		endpoint := GetEndPoint("", "1.0", "batch/decrypt")
 		ret, err := DoPost(endpoint,
 			GetCACertFile(),
 			AuthTokenKV(),
@@ -85,15 +92,16 @@ var batchTokenizeCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(batchTokenizeCmd)
-	batchTokenizeCmd.Flags().StringArrayP("policyName", "n", []string{},
-		"Name of the policy to be used to tokenization")
-	batchTokenizeCmd.Flags().StringArrayP("tokenData", "d", []string{},
-		"Data to be tokenized")
-	batchTokenizeCmd.Flags().StringArrayP("keyGuid", "k", []string{},
-		"Enter keyGuid if you want to tokenize data using specific version of the key else provide 0.")
+	rootCmd.AddCommand(batchDecryptCmd)
+	batchDecryptCmd.Flags().StringArrayP("data", "d", []string{}, "Data to be decrypted")
+	batchDecryptCmd.Flags().StringArrayP("keyGuid", "k", []string{}, "Key GUID to be used for decryption")
+	batchDecryptCmd.Flags().StringArrayP("mode", "m", []string{}, "Mode of decryption")
+	batchDecryptCmd.Flags().StringArrayP("iv", "i", []string{}, "Enter initialization vector if required else provide 0")
+	batchDecryptCmd.Flags().StringArrayP("aad", "a", []string{}, "Enter Additional authentication data if required else provide 0")
 
-	batchTokenizeCmd.MarkFlagRequired("policyName")
-	batchTokenizeCmd.MarkFlagRequired("tokenData")
-	batchTokenizeCmd.MarkFlagRequired("keyGuid")
+	batchDecryptCmd.MarkFlagRequired("data")
+	batchDecryptCmd.MarkFlagRequired("keyGuid")
+	batchDecryptCmd.MarkFlagRequired("mode")
+	batchDecryptCmd.MarkFlagRequired("iv")
+	batchDecryptCmd.MarkFlagRequired("aad")
 }

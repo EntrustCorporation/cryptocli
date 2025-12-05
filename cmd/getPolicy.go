@@ -17,82 +17,82 @@ limitations under the License.
 package cmd
 
 import (
-    // standard
-    "os"
-    "fmt"
-    "bytes"
-    "encoding/json"
-    // external
-    "github.com/spf13/cobra"
-)
+	// standard
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"os"
 
+	// external
+	"github.com/spf13/cobra"
+)
 
 // getPolicyCmd represents the get-policy command
 var getPolicyCmd = &cobra.Command{
-    Use:   "get-policy",
-    Short: "Get Policy details",
-    Run: func(cmd *cobra.Command, args []string) {
-        flags := cmd.Flags()
-        params := map[string]interface{}{}
+	Use:   "get-policy",
+	Short: "Get Policy details",
+	Run: func(cmd *cobra.Command, args []string) {
+		flags := cmd.Flags()
+		params := map[string]interface{}{}
 
-        // create request payload
-        policyid, _ := flags.GetString("policyid")
-        params["policy_id"] = policyid
+		// create request payload
+		policyid, _ := flags.GetString("policyid")
+		params["policy_id"] = policyid
 
-        if flags.Changed("version") {
-            version, _ := flags.GetInt("version")
-            params["version"] = version
-        }
+		if flags.Changed("version") {
+			version, _ := flags.GetInt("version")
+			params["version"] = version
+		}
 
-        // JSONify
-        jsonParams, err := json.Marshal(params)
-        if (err != nil) {
-            fmt.Println("Error building JSON request: ", err)
-            os.Exit(1)
-        }
+		// JSONify
+		jsonParams, err := json.Marshal(params)
+		if err != nil {
+			fmt.Println("Error building JSON request: ", err)
+			os.Exit(1)
+		}
 
-        // now POST
-        endpoint := GetEndPoint("", "1.0", "GetPolicy")
-        ret, err := DoPost(endpoint,
-                               GetCACertFile(),
-                               AuthTokenKV(),
-                               jsonParams,
-                               "application/json")
-        if err != nil {
-            fmt.Printf("\nHTTP request failed: %s\n", err)
-            os.Exit(4)
-        } else {
-            // type assertion
-            retBytes := ret["data"].(*bytes.Buffer)
-            retStatus := ret["status"].(int)
-            retStr := retBytes.String()
+		// now POST
+		endpoint := GetEndPoint("", "1.0", "GetPolicy")
+		ret, err := DoPost(endpoint,
+			GetCACertFile(),
+			AuthTokenKV(),
+			jsonParams,
+			"application/json")
+		if err != nil {
+			fmt.Printf("\nHTTP request failed: %s\n", err)
+			os.Exit(4)
+		} else {
+			// type assertion
+			retBytes := ret["data"].(*bytes.Buffer)
+			retStatus := ret["status"].(int)
+			retStr := retBytes.String()
 
-            if (retStr == "" && retStatus == 404) {
-                fmt.Println("\nPolicy not found\n")
-                os.Exit(5)
-            }
+			if retStr == "" && retStatus == 404 {
+				fmt.Println("\nPolicy not found\n")
+				os.Exit(5)
+			}
 
-            fmt.Println("\n" + retStr + "\n")
+			fmt.Println("\n" + retStr + "\n")
 
-            // make a decision on what to exit with
-            retMap := JsonStrToMap(retStr)
-            if _, present := retMap["error"]; present {
-                os.Exit(3)
-            } else {
-                os.Exit(0)
-            }
-        }
-    },
+			// make a decision on what to exit with
+			retMap := JsonStrToMap(retStr)
+			if _, present := retMap["error"]; present {
+				os.Exit(3)
+			} else {
+				os.Exit(0)
+			}
+		}
+	},
 }
 
 func init() {
-    rootCmd.AddCommand(getPolicyCmd)
-    getPolicyCmd.Flags().StringP("policyid", "p", "",
-                               "Id or name of the Policy to get")
-    getPolicyCmd.Flags().IntP("version", "v", 0,
-                              "Version of the Policy to fetch. If not " +
-                              "specified, fetches the current version")
+	rootCmd.AddCommand(getPolicyCmd)
+	getPolicyCmd.Flags().StringP("policyid", "p", "",
+		"Id of the Policy to get")
+	getPolicyCmd.Flags().IntP("version", "v", 0,
+		"Version of the Policy to fetch. If not "+
+			"specified, fetches the current version")
 
-    // mark mandatory fields as required
-    getPolicyCmd.MarkFlagRequired("policyid")
+	// mark mandatory fields as required
+	getPolicyCmd.MarkFlagRequired("policyid")
 }

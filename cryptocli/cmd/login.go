@@ -21,10 +21,12 @@ import (
 	"cli/getpasswd"
 	"encoding/json"
 	"fmt"
-	"github.com/spf13/cobra"
 	"net/url"
 	"os"
+	"regexp"
 	"strings"
+
+	"github.com/spf13/cobra"
 )
 
 const (
@@ -40,6 +42,10 @@ type accessToken struct {
 	Expiration string `json:"expires_at"`
 	User       string `json:"user"`
 }
+
+var VaultName = "Cryptographic APIs Vault"
+
+var login_url_pattern = `^https://\d{1,3}(\.\d{1,3}){3}/token/1\.0/Login/[0-9a-fA-F-]+/?$`
 
 func getCredentials(prefix, user, password string) (string, string) {
 
@@ -80,12 +86,10 @@ func loginAPI(cmd *cobra.Command, args []string) {
 	params["password"] = password
 
 	loginURL, _ := flags.GetString(loginOptionLoginURL)
-	if !strings.HasPrefix(loginURL, "https://") {
-		fmt.Printf("Provide complete login URL\n")
+	matched, err := regexp.MatchString(login_url_pattern, loginURL)
+	if err != nil || !matched {
+		fmt.Printf("Invalid %s login URL: %s\nPlease provide a valid login URL for %s\nExpected format: https://<ip>/token/1.0/Login/<vaultid>/\n", VaultName, loginURL, VaultName)
 		os.Exit(1)
-	}
-	if !strings.HasSuffix(loginURL, "/") {
-		loginURL = loginURL + "/"
 	}
 	uri, err := url.Parse(loginURL)
 	if err != nil {

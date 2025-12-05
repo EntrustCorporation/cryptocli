@@ -1,5 +1,5 @@
 /*
- Copyright 2020-2025 Entrust Corporation
+ Copyright 2025 Entrust Corporation
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,37 +17,33 @@ limitations under the License.
 package cmd
 
 import (
-	// standard
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
-
-	// external
 	"github.com/spf13/cobra"
 )
 
-// deletePolicyCmd represents the delete-policy command
-var deletePolicyCmd = &cobra.Command{
-	Use:   "delete-policy",
-	Short: "Delete Policy",
+var digestCmd = &cobra.Command{
+	Use:   "digest",
+	Short: "Message digest",
 	Run: func(cmd *cobra.Command, args []string) {
 		flags := cmd.Flags()
 		params := map[string]interface{}{}
 
-		// create request payload
-		policyid, _ := flags.GetString("policyid")
-		params["policy_id"] = policyid
+		data, _ := flags.GetString("data")
+		params["data"] = data
 
-		// JSONify
+		mode, _ := flags.GetString("mode")
+		params["mode"] = mode
+
 		jsonParams, err := json.Marshal(params)
 		if err != nil {
 			fmt.Println("Error building JSON request: ", err)
 			os.Exit(1)
 		}
 
-		// now POST
-		endpoint := GetEndPoint("", "1.0", "DeletePolicy")
+		endpoint := GetEndPoint("", "1.0", "digest")
 		ret, err := DoPost(endpoint,
 			GetCACertFile(),
 			AuthTokenKV(),
@@ -57,39 +53,32 @@ var deletePolicyCmd = &cobra.Command{
 			fmt.Printf("\nHTTP request failed: %s\n", err)
 			os.Exit(4)
 		} else {
-			// type assertion
 			retBytes := ret["data"].(*bytes.Buffer)
 			retStatus := ret["status"].(int)
 			retStr := retBytes.String()
 
 			if retStr == "" && retStatus == 404 {
-				fmt.Println("\nPolicy not found\n")
+				fmt.Println("\nAction denied\n")
 				os.Exit(5)
 			}
 
-			if retStatus == 200 {
-				fmt.Println("\nPolicy deleted successfully\n")
-				os.Exit(0)
+			retMap := JsonStrToMap(retStr)
+			if _, present := retMap["error"]; present {
+				fmt.Println("\n" + retStr + "\n")
+				os.Exit(3)
 			} else {
 				fmt.Println("\n" + retStr + "\n")
-
-				// make a decision on what to exit with
-				retMap := JsonStrToMap(retStr)
-				if _, present := retMap["error"]; present {
-					os.Exit(3)
-				} else {
-					os.Exit(100)
-				}
+				os.Exit(0)
 			}
 		}
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(deletePolicyCmd)
-	deletePolicyCmd.Flags().StringP("policyid", "p", "",
-		"Id of the Policy to be deleted")
+	rootCmd.AddCommand(digestCmd)
+	digestCmd.Flags().StringP("data", "d", "", "data to be digested (base64 encoded)")
+	digestCmd.Flags().StringP("mode", "m", "", "Message Digest Mode (e.g., SHA-256, SHA-512)")
 
-	// mark mandatory fields as required
-	deletePolicyCmd.MarkFlagRequired("policyid")
+	digestCmd.MarkFlagRequired("data")
+	digestCmd.MarkFlagRequired("mode")
 }

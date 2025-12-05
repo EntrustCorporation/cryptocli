@@ -26,7 +26,7 @@ import (
 
 	// custom
 	"cli/getpasswd"
-	
+
 	// external
 	"github.com/spf13/cobra"
 )
@@ -71,7 +71,6 @@ type InitialADmember struct {
 	Mail              string `json:"mail,omitempty"`
 	UPN               string `json:"upn,omitempty"`
 }
-
 
 type updateTenentAuthModeToADApiResponse struct {
 	Result string `json:"result"`
@@ -175,7 +174,6 @@ func updateTenantAuthMethodToAD(cmd *cobra.Command, args []string) {
 
 	params["initial_admember"] = initialADmember
 
-
 	jsonParams, err := json.Marshal(params)
 	if err != nil {
 		fmt.Println("Error building JSON request: ", err)
@@ -199,8 +197,8 @@ func updateTenantAuthMethodToAD(cmd *cobra.Command, args []string) {
 func init() {
 
 	var updateTenantAuthMethodToADCommand = &cobra.Command{
-		Use:   "update-tenant-auth-method-to-ad",
-		Short: "Update Tenant Auth Method To AD",
+		Use:   "update-vault-auth-method-to-ad",
+		Short: "Update Vault Auth Method To AD",
 		Run:   updateTenantAuthMethodToAD,
 	}
 	updateTenantAuthMethodToADCommand.Flags().StringP(authADDomainName, "a", "",
@@ -211,11 +209,11 @@ func init() {
 		"Active Directory domain type. Supported values: microsoft_Ad, openLDAP")
 	updateTenantAuthMethodToADCommand.Flags().StringP(adServiceAccountName, "s", "",
 		"Active Directory Service Account User Name. "+
-		"Users have the option to input values either through the console or by using a flag "+
+			"Users have the option to input values either through the console or by using a flag "+
 			"To clear, set it to \"unset\".")
 	updateTenantAuthMethodToADCommand.Flags().StringP(adServiceAccountPw, "p", "",
 		"Active Directory Service Account Password. "+
-		"Users have the option to input values either through the console or by using a flag")
+			"Users have the option to input values either through the console or by using a flag")
 	updateTenantAuthMethodToADCommand.Flags().StringP(adServers, "j", "",
 		"Path to the Active Directory Domain server List JSON File. The file should  "+
 			"contain an array of JSON objects, each object representing a Domain Controller. "+
