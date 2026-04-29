@@ -25,7 +25,7 @@ var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Version of Entrust Cryptographic APIs Vault CLI",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("1.1")
+		fmt.Println("1.2")
 	},
 }
 
