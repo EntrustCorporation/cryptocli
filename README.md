@@ -28,4 +28,4 @@ The code in this repo corresponds to the latest released version of cryptocli. I
 
    ```$ gmake clean```
 
-For more information, see the Tokenization Vault chapter in the Key Management Systems documentation at https://trustedcare.entrust.com/.
+For more information, see the "Cryptographic Security Vault for Cryptographic APIs" chapter in the Key Management Systems documentation at https://trustedcare.entrust.com/.
