@@ -14,14 +14,14 @@ Access to certain commands can be restricted using tokenization permissions from
 
 ## Releases
 
-cryptocli's for Linux & Windows for each release can be found in Releases section (https://github.com/EntrustCorporation/cryptocli/releases)
+cryptocli for Linux, for each release can be found in Releases section (https://github.com/EntrustCorporation/cryptocli/releases)
 
 ## Build instructions
 
 The code in this repo corresponds to the latest released version of cryptocli. In general, to use cryptocli, head over to Releases section to get pre-compiled binaries. If you do plan to build, follow instructions below.
 1. Install go. cryptocli/Makefile expects to find go at /usr/local/go/bin/go
 2. cd to cryptocli/
-3. To build Linux & Windows cli binaries,
+3. To build Linux cli binary,
    
    ```$ gmake all```
 5. To clean workspace,
