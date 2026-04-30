@@ -6,9 +6,9 @@ The KeyControl Application Security Vault provides centralized mechanism to crea
 
 cryptocli requires Entrust KeyControl version 10.2 or later. 
 
-An Application Security Vault must be created by the KeyControl Security Administrator. 
+A Cryptographic APIs Vault must be created by the KeyControl Security Administrator. 
 
-Both Application Security Vault Users and Administrators can access secrets using the cryptocli with the login URL. 
+Both Cryptographic APIs Vault Users and Administrators can access secrets using the cryptocli with the login URL. 
 
 Access to certain commands can be restricted using tokenization permissions from access policies.
 
