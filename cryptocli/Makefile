@@ -16,7 +16,6 @@ WORKSPACE_BINDIR = $(WORKSPACE)/bin
 CRYPTOCLI_MAINGO = main.go
 
 CRYPTOCLI_LINUX = cryptocli
-CRYPTOCLI_WINDOWS = cryptocli.exe
 
 all:
 	@/usr/bin/echo "Clearing old Workspace if any at $(WORKSPACE).."
@@ -29,10 +28,9 @@ all:
 	@/usr/bin/cp -r $(PARENTDIR)/cmd/. $(WORKSPACE_SRCDIR)/cmd/
 	@cd $(WORKSPACE_SRCDIR) && $(GOCMD) mod init cli
 	@cd $(WORKSPACE_SRCDIR) && $(GOCMD) mod tidy
-	@/usr/bin/echo "Compiling cryptocli for Linux & Windows..."
+	@/usr/bin/echo "Compiling cryptocli for Linux..."
 	@cd $(WORKSPACE_SRCDIR) && (env GOOS=linux GOARCH=amd64 $(GOCMD) build -o $(WORKSPACE_BINDIR)/$(CRYPTOCLI_LINUX) $(CRYPTOCLI_MAINGO))
-	@cd $(WORKSPACE_SRCDIR) && (env GOOS=windows GOARCH=amd64 $(GOCMD) build -o $(WORKSPACE_BINDIR)/$(CRYPTOCLI_WINDOWS) $(CRYPTOCLI_MAINGO))
-	@/usr/bin/echo "Please find respective Linux & Windows cryptocli binaries, $(CRYPTOCLI_LINUX) & $(CRYPTOCLI_WINDOWS) at $(WORKSPACE_BINDIR)"
+	@/usr/bin/echo "Please find Linux cryptocli binary, $(CRYPTOCLI_LINUX) at $(WORKSPACE_BINDIR)"
 
 install:
 
